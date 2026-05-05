@@ -122,6 +122,22 @@ dotnet publish src/Firestarter.App -c Release -r win-x64 --self-contained true
 The `BuildWeb` MSBuild target in `Firestarter.App.csproj` invokes
 `npm ci && npm run build` automatically when `Configuration=Release`.
 
+### Windows installer
+
+[Inno Setup](https://jrsoftware.org/isdl.php) is used to package the
+self-contained publish output into a single `.exe` installer that handles
+shortcuts and Add/Remove Programs.
+
+```powershell
+# Publish + compile + drop Firestarter-<version>-setup.exe into dist\
+pwsh installer\build-installer.ps1
+```
+
+The script auto-resolves the version from the published assembly. Override
+with `-Version 1.4.2` or skip the publish step with `-SkipPublish`. Default
+install location is `%LOCALAPPDATA%\Programs\Firestarter` (per-user, no UAC);
+the wizard offers a system-wide elevation if requested.
+
 ## Configuration
 
 All runtime configuration lives in the SQLite database under

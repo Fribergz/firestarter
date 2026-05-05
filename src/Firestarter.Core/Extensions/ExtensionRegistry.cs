@@ -33,7 +33,7 @@ public class ExtensionRegistry(FirestarterDbContext db, ILogger<ExtensionRegistr
     public async Task<string?> GetRootAsync(CancellationToken ct)
     {
         var row = await _db.KeyValueSettings.FirstOrDefaultAsync(k => k.Key == ExtensionsRootKey, ct);
-        return row?.Value;
+        return string.IsNullOrWhiteSpace(row?.Value) ? AppPaths.DefaultExtensionsDir : row!.Value;
     }
 
     public async Task SetRootAsync(string? path, CancellationToken ct)

@@ -14,7 +14,17 @@
   </ItemGroup>
 
   <PropertyGroup>
-    <OutputType>Exe</OutputType>
+    <Version>0.0.1</Version>
+    <!--
+      Debug builds use OutputType=Exe so the console is attached and `Console.Error.WriteLine` /
+      logger output is visible while debugging. Release builds use WinExe so launching the published
+      app from Explorer (or the Start menu) doesn't pop up a console window alongside the GUI.
+    -->
+    <OutputType Condition="'$(Configuration)' == 'Debug'">Exe</OutputType>
+    <OutputType Condition="'$(Configuration)' != 'Debug'">WinExe</OutputType>
+    <!-- Project name is Firestarter.App but the produced binary is just `Firestarter.exe`. -->
+    <AssemblyName>Firestarter</AssemblyName>
+    <RootNamespace>Firestarter.App</RootNamespace>
     <TargetFramework>net10.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationIcon>Assets\Firestarter.ico</ApplicationIcon>
@@ -24,6 +34,14 @@
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <WebProjectDir>$(MSBuildThisFileDirectory)..\Firestarter.Web</WebProjectDir>
     <WebOutputDir>$(MSBuildThisFileDirectory)wwwroot</WebOutputDir>
+    <!--
+      BuildWeb controls whether `npm run build` runs as part of the .NET build.
+        * Defaults to true on Release builds — published output ships the Svelte bundle.
+        * Defaults to false otherwise — dev `dotnet build` stays fast; Vite serves assets in development.
+      Override with `-p:BuildWeb=true` (e.g. for a Debug publish) or `-p:BuildWeb=false`.
+      Note: `dotnet publish` without `-c Release` will NOT rebuild the web bundle, so always pass
+      `-c Release` (or `-p:BuildWeb=true`) when producing a distributable.
+    -->
     <BuildWeb Condition="'$(BuildWeb)' == '' and '$(Configuration)' == 'Release'">true</BuildWeb>
     <BuildWeb Condition="'$(BuildWeb)' == ''">false</BuildWeb>
   </PropertyGroup>
@@ -33,14 +51,28 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
     </Content>
-    <Content Include="wwwroot\**\*" Condition="Exists('wwwroot')">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-    </Content>
+    <!--
+      The wwwroot tree is NOT included statically: the file list is captured at project-load
+      time, but `BuildWebAssets` later wipes wwwroot and re-emits files with new content-hashed
+      filenames, which makes the captured (old) Content items reference deleted files and breaks
+      the copy step. The matching <Content Include="wwwroot\**\*"> lives inside `BuildWebAssets`
+      so it runs AFTER `npm run build` and only ever sees the freshly-generated set of files.
+    -->
   </ItemGroup>
 
-  <Target Name="BuildWebAssets" BeforeTargets="AssignTargetPaths" Condition="'$(BuildWeb)' == 'true'">
-    <Message Importance="high" Text="Building Svelte web assets from $(WebProjectDir)" />
+  <!--
+    Force BuildWeb=true on every `dotnet publish`, regardless of Configuration. Without this a plain
+    `dotnet publish` (Debug) would skip `npm run build` and ship an empty/stale wwwroot, which makes
+    the launched exe fail with `app://app/index.html could not be found`.
+  -->
+  <Target Name="EnableBuildWebForPublish" BeforeTargets="BuildWebAssets" Condition="'$(_IsPublishing)' == 'true'">
+    <PropertyGroup>
+      <BuildWeb>true</BuildWeb>
+    </PropertyGroup>
+  </Target>
+
+  <Target Name="BuildWebAssets" BeforeTargets="AssignTargetPaths" Condition="'$(BuildWeb)' == 'true' or '$(_IsPublishing)' == 'true'">
+    <Message Importance="high" Text="Building Svelte web assets from $(WebProjectDir) (Configuration=$(Configuration))" />
     <Exec Command="npm ci" WorkingDirectory="$(WebProjectDir)" Condition="!Exists('$(WebProjectDir)\node_modules')" />
     <Exec Command="npm run build" WorkingDirectory="$(WebProjectDir)" />
     <ItemGroup>

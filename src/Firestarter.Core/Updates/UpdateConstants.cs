@@ -7,7 +7,7 @@ namespace Firestarter.Core.Updates;
 /// <code>
 /// {
 ///   "version": "1.4.2",
-///   "downloadUrl": "https://gitlab.example.com/.../firestarter-1.4.2.zip",
+///   "downloadUrl": "https://github.com/.../v1.4.2/firestarter-x64.zip",
 ///   "sha256": "optional"
 /// }
 /// </code>
@@ -17,7 +17,7 @@ namespace Firestarter.Core.Updates;
 public static class UpdateConstants
 {
     /// <summary>Raw URL to the JSON manifest. Replace with your real GitLab raw file URL.</summary>
-    public const string ManifestUrl = "https://gitlab.example.com/your-group/firestarter/-/raw/main/releases/latest.json";
+    public const string ManifestUrl = "https://raw.githubusercontent.com/Fribergz/firestarter/refs/heads/main/latest.json";
 
     public static readonly TimeSpan CheckInterval = TimeSpan.FromHours(1);
     public static readonly TimeSpan StartupDelay = TimeSpan.FromSeconds(20);

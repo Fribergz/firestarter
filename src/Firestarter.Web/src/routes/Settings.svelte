@@ -506,7 +506,7 @@
             <input
               type="text"
               bind:value={ideDraft.executablePath}
-              placeholder="C:\\Users\\you\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe"
+              placeholder="C:\Users\you\AppData\Local\Programs\Microsoft VS Code\Code.exe"
               class="focus-ring border border-hair-strong bg-paper px-2 py-1.5 text-ink"
               style={inputStyle}
             />

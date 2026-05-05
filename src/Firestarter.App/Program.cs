@@ -1,5 +1,4 @@
 using Firestarter.App.Ipc;
-using Firestarter.App.Web;
 using Firestarter.Core.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -47,15 +46,16 @@ public static class Program
                 .SetSize(1560, 1024)
                 .Center()
                 .SetChromeless(true)
+                .SetDevToolsEnabled(true)
                 .SetContextMenuEnabled(false)
                 .SetNotificationRegistrationId("2F0E8B5C-0D4A-4B7E-8C3D-A1B2C3D4E5F6")
                 .SetNotificationsEnabled(false)
                 .RegisterWebMessageReceivedHandler((sender, message) => dispatcher.Dispatch(message));
 
-            if (useEmbedded)
-                window.RegisterCustomSchemeHandler("app", EmbeddedWebAssets.Handle);
-
-            window.StartUrl = url;
+            // `Load(Uri)` writes directly into _startupParameters; the `StartUrl` setter / `Load(string)`
+            // path is buggy for non-http schemes (silently logs "could not be found" without setting
+            // the URL).
+            window.Load(new Uri(url));
 
             window.WindowCreatedHandler += (_, _) =>
             {
@@ -79,16 +79,31 @@ public static class Program
     static (string Url, bool UseEmbedded) ResolveStartUrl(IHostEnvironment env)
     {
         const string DevUrl = "http://127.0.0.1:5173/";
-        var embedded = Path.Combine(AppContext.BaseDirectory, "wwwroot", "index.html");
+        var wwwroot = Path.Combine(AppContext.BaseDirectory, "wwwroot");
+        var embedded = Path.Combine(wwwroot, "index.html");
         var embeddedExists = File.Exists(embedded);
 
         if (env.IsDevelopment() && IsViteListening())
             return (DevUrl, false);
 
         if (embeddedExists)
-            return (EmbeddedWebAssets.StartUrl, true);
+        {
+            // Photino's RegisterCustomSchemeHandler is documented as not firing for the initial
+            // page navigation (issue #209, "wontfix"), so the previous app:// scheme produced an
+            // empty about:blank. Serve the bundle from the local filesystem directly — Vite is
+            // configured with `base: './'` so every asset reference inside index.html stays
+            // relative to the wwwroot folder and resolves on the same file:// origin.
+            var fileUri = new Uri(embedded).AbsoluteUri;
+            return (fileUri, true);
+        }
 
-        return (DevUrl, false);
+        // We're not in dev mode and there is no embedded bundle on disk — Photino would otherwise fail
+        // with a misleading "Startup Parameters Are Not Valid" / "could not be found" error. Surface
+        // the real cause and the fix.
+        throw new InvalidOperationException(
+            $"No web bundle found at \"{embedded}\" and the Vite dev server is not running on {DevUrl}. " +
+            "Run `dotnet publish -c Release` (or `-p:BuildWeb=true`) so wwwroot is rebuilt and copied " +
+            "into the publish output, or start the Vite dev server with `npm run dev` for development.");
     }
 
     static bool IsViteListening()
