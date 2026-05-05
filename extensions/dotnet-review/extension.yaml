@@ -1,0 +1,14 @@
+name: dotnet-review
+description: Build, test and analyze a .NET repository. Captures analyzer diagnostics, test metrics, and outdated NuGet packages.
+entrypoint: run.ps1
+timeoutSeconds: 1800
+targets:
+  - view: merge-request
+    label: Review
+  - view: project
+    label: Review
+settings:
+  - name: hiddenCodes
+    label: Hidden diagnostic codes
+    description: Comma-separated diagnostic codes to hide from the Analyzers tab and the Top Diagnostic Codes summary (e.g. CA1822, IDE0051, WHITESPACE). Existing run history is honoured immediately.
+    type: multi-string

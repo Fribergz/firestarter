@@ -1,0 +1,54 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\Firestarter.Core\Firestarter.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.7">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.7" />
+    <PackageReference Include="Photino.NET" Version="4.0.16" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0-windows</TargetFramework>
+    <UseWindowsForms>true</UseWindowsForms>
+    <ApplicationIcon>Assets\Firestarter.ico</ApplicationIcon>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <!-- Required by the LibraryImport (P/Invoke) source generator's emitted code. -->
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <WebProjectDir>$(MSBuildThisFileDirectory)..\Firestarter.Web</WebProjectDir>
+    <WebOutputDir>$(MSBuildThisFileDirectory)wwwroot</WebOutputDir>
+    <BuildWeb Condition="'$(BuildWeb)' == '' and '$(Configuration)' == 'Release'">true</BuildWeb>
+    <BuildWeb Condition="'$(BuildWeb)' == ''">false</BuildWeb>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="Assets\Firestarter.ico">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+    <Content Include="wwwroot\**\*" Condition="Exists('wwwroot')">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+    </Content>
+  </ItemGroup>
+
+  <Target Name="BuildWebAssets" BeforeTargets="AssignTargetPaths" Condition="'$(BuildWeb)' == 'true'">
+    <Message Importance="high" Text="Building Svelte web assets from $(WebProjectDir)" />
+    <Exec Command="npm ci" WorkingDirectory="$(WebProjectDir)" Condition="!Exists('$(WebProjectDir)\node_modules')" />
+    <Exec Command="npm run build" WorkingDirectory="$(WebProjectDir)" />
+    <ItemGroup>
+      <Content Include="wwwroot\**\*">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+      </Content>
+    </ItemGroup>
+  </Target>
+
+</Project>

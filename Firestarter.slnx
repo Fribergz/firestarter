@@ -1,0 +1,14 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".gitignore" />
+    <File Path="nuget.config" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/Firestarter.App/Firestarter.App.csproj" />
+    <Project Path="src/Firestarter.Core/Firestarter.Core.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Firestarter.Core.Tests/Firestarter.Core.Tests.csproj" />
+  </Folder>
+</Solution>

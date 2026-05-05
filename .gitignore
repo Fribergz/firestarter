@@ -1,0 +1,158 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# Project-specific
+# ─────────────────────────────────────────────────────────────────────────────
+_designs/
+
+# Local SQLite (in case anyone copies the dev DB into the tree)
+*.db
+*.db-shm
+*.db-wal
+
+# ─────────────────────────────────────────────────────────────────────────────
+# .NET / C# / Visual Studio
+# ─────────────────────────────────────────────────────────────────────────────
+
+# Build outputs
+[Bb]in/
+[Oo]bj/
+[Oo]ut/
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+[Pp]ublish/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+artifacts/
+
+# Roslyn analyzer / build cache
+.vs/
+.vscode/
+*.user
+*.userosscache
+*.suo
+*.userprefs
+*.sln.docstates
+*.csproj.user
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+**/packages/*
+!**/packages/build/
+*.nuget.props
+*.nuget.targets
+
+# Test results
+[Tt]est[Rr]esult*/
+*.coverage
+*.coveragexml
+*.trx
+*.testsettings
+.coverlet/
+
+# Profiling / diagnostics
+*.dotCover
+*.psess
+*.vsp
+*.vspx
+*.sap
+
+# Generated files
+*_i.c
+*_p.c
+*_i.h
+*.ilk
+*.meta
+*.obj
+*.iobj
+*.pch
+*.pdb
+*.ipdb
+*.pgc
+*.pgd
+*.rsp
+*.sbr
+*.tlb
+*.tli
+*.tlh
+*.tmp
+*.tmp_proj
+*_wpftmp.csproj
+*.log
+*.tlog
+*.vspscc
+*.vssscc
+.builds
+*.pidb
+*.svclog
+*.scc
+
+# JetBrains Rider
+.idea/
+*.sln.iml
+
+# ReSharper
+_ReSharper*/
+*.[Rr]e[Ss]harper
+*.DotSettings.user
+
+# Windows / OS junk
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+# ─────────────────────────────────────────────────────────────────────────────
+# Node / Svelte / Vite / TypeScript
+# ─────────────────────────────────────────────────────────────────────────────
+node_modules/
+.pnp/
+.pnp.*
+.yarn/cache
+.yarn/unplugged
+.yarn/install-state.gz
+
+# Build outputs
+dist/
+build/
+.svelte-kit/
+.vite/
+.output/
+
+# When the .NET host bundles the Svelte build it lands in Firestarter.App/wwwroot.
+src/Firestarter.App/wwwroot/
+
+# Photino.NET
+.artifacts
+
+# AI
+.claude
+
+# TypeScript / type-check artefacts
+*.tsbuildinfo
+.tscache/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# Optional caches
+.eslintcache
+.stylelintcache
+.parcel-cache/
+
+# Editor / OS artefacts at the JS layer
+.vscode-test/
+
+# Environment files (local only)
+.env
+.env.*
+!.env.example
